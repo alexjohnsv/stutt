@@ -10,6 +10,7 @@ const app = express();
 // middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.static('./public'));
 
 app.post('/api/create', async (req, res) => {
   const id = await client.asyncIncr('id');
