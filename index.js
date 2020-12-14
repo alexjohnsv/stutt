@@ -4,7 +4,7 @@ const { encode } = require('./utils/shortener');
 const client = require('./lib/redis-client');
 const yup = require('yup');
 
-const urlValidator = yup.string().url();
+const urlValidator = yup.string().required().url();
 
 const port = process.env.PORT || 3000;
 
@@ -28,7 +28,9 @@ app.post('/api/create', async (req, res) => {
 
   await client.setAsync(encoded, url);
 
-  res.json({'url': encoded});
+  const newUrl = req.protocol + '://' + req.get('host') + '/' + encoded;
+
+  res.json({'message': newUrl});
 });
 
 

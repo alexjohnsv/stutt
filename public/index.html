@@ -13,9 +13,38 @@
   <main class="main">
     <div class="wrapper">
       <h1>URL Shortener</h1>
+      <div class="message js-message hide"></div>
       <input class="input-url" type="text" placeholder="https://...">
-      <button class="submit">Shorten URL</button>
+      <button class="submit js-submit">Shorten URL</button>
     </div>
   </main>
+
+  <script>
+    const submitButton = document.querySelector('.js-submit');
+    const inputUrl = document.querySelector('.input-url');
+    const message = document.querySelector('.js-message');
+
+    submitButton.addEventListener('click', (e) => {
+      submitButton.disabled = true;
+
+      const data = { url: inputUrl.value };
+
+      fetch('/api/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json())
+      .then(data => {
+        submitButton.disabled = false;
+        message.classList.remove('hide');
+        message.textContent = data.message;
+      });
+
+    });
+
+  </script>
 </body>
 </html>
