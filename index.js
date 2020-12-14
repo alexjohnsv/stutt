@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const { encode } = require('./utils/shortener');
 const client = require('./lib/redis-client');
+const yup = require('yup');
+
+const urlValidator = yup.string().url();
 
 const port = process.env.PORT || 3000;
 
@@ -13,10 +16,15 @@ app.use(express.json());
 app.use(express.static('./public'));
 
 app.post('/api/create', async (req, res) => {
+  const url = req.body.url;
+  const urlIsValid = await urlValidator.isValid(url);
+
+  if (!urlIsValid) {
+    return res.status(400).json({'message': 'Invalid URL'});
+  }
+
   const id = await client.asyncIncr('id');
   const encoded = encode(id);
-
-  const url = req.body.url;
 
   await client.setAsync(encoded, url);
 
