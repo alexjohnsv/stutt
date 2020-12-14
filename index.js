@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { encode, decode } = require('./utils/shortener');
+const { encode } = require('./utils/shortener');
 const client = require('./lib/redis-client');
 
 const port = process.env.PORT || 3000;
@@ -10,10 +10,6 @@ const app = express();
 // middlewares
 app.use(cors());
 app.use(express.json());
-
-app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}`);
-});
 
 app.post('/api/create', async (req, res) => {
   const id = await client.asyncIncr('id');
@@ -30,5 +26,14 @@ app.post('/api/create', async (req, res) => {
 app.get('/:s', async (req, res) => {
   const url = await client.getAsync(req.params.s);
 
-  return res.json({'url': url});
+  if (!url) {
+    return res.status(404).send('404 Not Found');
+  }
+
+  return res.redirect(url);
 })
+
+
+app.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}`);
+});
