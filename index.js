@@ -19,20 +19,23 @@ app.post('/api/create', async (req, res) => {
 
   await client.setAsync(encoded, url);
 
-  return res.json({'url': encoded});
+  res.json({'url': encoded});
 });
 
 
-app.get('/:s', async (req, res) => {
+app.get('/:s', async (req, res, next) => {
   const url = await client.getAsync(req.params.s);
 
   if (!url) {
-    return res.status(404).send('404 Not Found');
+    return next();
   }
 
-  return res.redirect(url);
+  res.redirect(url);
 })
 
+app.use(function (req, res, next) {
+  res.status(404).send('404 Not Found');
+})
 
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
